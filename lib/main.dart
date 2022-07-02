@@ -1,5 +1,9 @@
 import 'package:dictionary_en_to_en/firebase_options.dart';
+import 'package:dictionary_en_to_en/models/history_model.dart';
 import 'package:dictionary_en_to_en/providers/dictionary_state.dart';
+import 'package:dictionary_en_to_en/providers/firestore_state.dart';
+import 'package:dictionary_en_to_en/repositorys/history_repository.dart';
+import 'package:dictionary_en_to_en/views/history_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +22,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final HistoryRepository _db = HistoryRepository();
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-            create: (BuildContext context) => DictionaryState(context),
-          ),
+          ChangeNotifierProvider(create: (context) => FirestoreState(context)),
+          ChangeNotifierProvider(create: (context) => DictionaryState(context)),
+          StreamProvider<List<HistoryModel>>(create: (BuildContext context) => _db.getStream(), initialData: [],)
         ],
         child:MaterialApp(
           title: 'Dictionary',
@@ -46,13 +51,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   DictionaryState? state;
-  void _incrementCounter() {
-    state!.getWord('word');
-  }
 
   @override
   Widget build(BuildContext context) {
-    state = Provider.of<DictionaryState>(context, listen:false);
     return MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => DictionaryState(context))
     ],
@@ -77,16 +78,37 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                         onSubmitted:(val) => state.getWord(val)
                     ),
-                   TextButton(
-                       onPressed: ()  => state.getWord(state.controller.text),
-                       child: Text(
-                         'Search',
-                         style: TextStyle(
-                           fontWeight: FontWeight.bold,
-                           fontSize: 20.0,
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       TextButton(
+                         onPressed: ()  => state.getWord(state.controller.text),
+                         child: Text(
+                           'Search',
+                           style: TextStyle(
+                             fontWeight: FontWeight.bold,
+                             fontSize: 20.0,
+                           ),
                          ),
                        ),
+                       TextButton(
+                         onPressed: () {
+                           Navigator.push(context,
+                               MaterialPageRoute(
+                                   builder: (context) => HistoryView(title: 'History',)
+                               ));
+                         },
+                         child: Text(
+                           'History',
+                           style: TextStyle(
+                             fontWeight: FontWeight.bold,
+                             fontSize: 20.0,
+                           ),
+                         ),
+                       ),
+                     ],
                    ),
+
                    SizedBox(height: 8,),
                     Text(
                       'Word:',
@@ -123,7 +145,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         shrinkWrap: true,
                         itemCount: state.wordData.meanings!.length,
                         itemBuilder: (BuildContext ctxt, int index) {
-                          print(index);
                           return Container(
                               padding: EdgeInsets.all(4),
                               child: Column(

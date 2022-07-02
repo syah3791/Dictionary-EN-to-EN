@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dictionary_en_to_en/models/history_model.dart';
 import 'package:dictionary_en_to_en/models/word_model.dart';
+import 'package:dictionary_en_to_en/providers/firestore_state.dart';
 import 'package:dictionary_en_to_en/repositorys/history_repository.dart';
 import 'package:dictionary_en_to_en/services/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DictionaryState with ChangeNotifier {
   BuildContext context;
@@ -37,6 +39,7 @@ class DictionaryState with ChangeNotifier {
           if(res.length > 0) {
             _wordData = WordModel.fromJson(jsonDecode(res)[0] as Map<String, dynamic>);
           }
+          Provider.of<FirestoreState>(context, listen:false).addHistory(word);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('$res'),

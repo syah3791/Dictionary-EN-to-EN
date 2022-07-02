@@ -5,9 +5,9 @@ class HistoryModel {
   String? word;
   bool? favorite;
 
-  factory HistoryModel.fromJson(Map<String, dynamic> json) {
+  factory HistoryModel.fromJson(Map<String, dynamic> json, String refId) {
     return HistoryModel(
-      id: json['id'],
+      id: refId,
       word: json['word'],
       favorite: json['favorite'],
     );
