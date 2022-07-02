@@ -53,25 +53,141 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     state = Provider.of<DictionaryState>(context, listen:false);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '${state!.wordData.word ?? ''}',
+    return MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => DictionaryState(context))
+    ],
+      child: Consumer(
+        builder: (BuildContext context, DictionaryState state, Widget? child){
+          this.state = state;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(widget.title),
             ),
-          ],
-        ),
+            body: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TextField(
+                        controller: state.controller,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Search',
+                      ),
+                        onSubmitted:(val) => state.getWord(val)
+                    ),
+                   SizedBox(height: 8,),
+                    Text(
+                      'Word:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    Text(
+                      '   ${state.wordData.word ?? ''}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    Text(
+                      '   ${state.wordData.phonetic ?? ''}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    SizedBox(height: 8,),
+                    Text(
+                      'Meaning:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ),
+
+                    state.wordData.meanings == null ? Container(): ListView.builder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: state.wordData.meanings!.length,
+                        itemBuilder: (BuildContext ctxt, int index) {
+                          print(index);
+                          return Container(
+                              padding: EdgeInsets.all(4),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    '${state.wordData.meanings![index].partOfSpeech ?? ''}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                  ListView.builder(
+                                      physics: ScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: state.wordData.meanings![index].definitions!.length,
+                                  itemBuilder: (BuildContext ctxt, int index2) {
+                                    return Container(
+                                        padding: EdgeInsets.all(4),
+                                        margin: EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black12.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: Colors.black.withOpacity(0.1),
+                                        ),
+                                      ),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              'Definition',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${state.wordData.meanings![index].definitions![index2].definition ?? ''}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Example',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${state.wordData.meanings![index].definitions![index2].example ?? ''}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                    );
+                                  }
+                              ),
+
+                                ],
+                              )
+                          );
+                        }
+                    )
+                  ],
+                ),
+              )
+            ), // This trailing comma makes auto-formatting nicer for build methods.
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

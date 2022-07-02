@@ -12,6 +12,7 @@ class DictionaryState with ChangeNotifier {
   BuildContext context;
   final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>(debugLabel: 'MainView');
   final HistoryRepository repository = HistoryRepository();
+  TextEditingController _controller = TextEditingController();
   bool _isLoading = false;
   WordModel _wordData = new WordModel();
   DictionaryState(this.context){
@@ -21,6 +22,7 @@ class DictionaryState with ChangeNotifier {
   bool get isLoading =>  _isLoading;
   get scaffoldState => _scaffoldState;
   WordModel get wordData =>  _wordData;
+  get controller => _controller;
 
   getWord(String word){
     _isLoading = true;
