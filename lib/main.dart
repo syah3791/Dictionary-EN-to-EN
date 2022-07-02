@@ -77,6 +77,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                         onSubmitted:(val) => state.getWord(val)
                     ),
+                   TextButton(
+                       onPressed: ()  => state.getWord(state.controller.text),
+                       child: Text(
+                         'Search',
+                         style: TextStyle(
+                           fontWeight: FontWeight.bold,
+                           fontSize: 20.0,
+                         ),
+                       ),
+                   ),
                    SizedBox(height: 8,),
                     Text(
                       'Word:',
